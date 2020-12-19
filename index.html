@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The spookie door</title>
+    <style>
+        @font-face {
+            font-family: 'subwt';
+            src: url('SUBWT___.ttf') format('ttf'),
+                url('SUBWT___.ttf') format('truetype');
+        }
+
+        * {
+            font-family: 'subwt';
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.5em;
+            color: white;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            /* overflow: hidden; */
+
+
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            background-color: black;
+        }
+
+        #container {
+            border: 1px solid white;
+            min-height: 100px;
+            width: calc(100vw - 64px);
+            padding: 16px;
+            /* margin: 0 32px; */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+        }
+
+        #gif {
+            flex: 0;
+            max-height: 200px;
+            /* width: 200px; */
+            margin-right: 16px;
+        }
+
+        #text {
+            /* flex: 1 1 auto; */
+            /* border: 1px solid red; */
+            /* width: calc(100% - 200px); */
+            /* max-width: 100%; */
+            /* max-width: 80%; */
+            /* word-wrap: normal; */
+            word-wrap: break-word !important;
+            word-wrap: break-all;
+            /* white-space: pre-line; */
+        }
+
+        @media only screen and (max-width: 600px) {
+            #container {
+                flex-direction: column;
+            }
+
+            #gif {
+                margin-bottom: 16px;
+                margin-right: 0;
+            }
+
+            #text {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <img id="gif" src=""
+            alt="Speaking Character GIF" />
+        <div id="text">
+        </div>
+    </div>
+    <script>
+
+        const container = document.getElementById("container");
+        const gifEl = document.getElementById("gif");
+        const textEl = document.getElementById("text");
+        const queries = window.location.search.substring(1).split('&').flatMap(query => query.split('='));
+        let speed = 200;
+        textEl.style.width = container.clientWidth - gifEl.clientWidth - 32 - 16 + 'px';
+
+        const gifs = (src) => {
+            console.log('SOURCE: ' + src);
+            switch (src) {
+                case '': return 'https://media.tenor.com/images/760939e5dd77b06637ddd716f67ee8f6/tenor.gif'
+                case 'girl': return 'https://media1.tenor.com/images/c748732127a8d180888fa4520a08ab14/tenor.gif?itemid=15967773';
+                default: return src;
+            }
+        }
+
+        const texts = (text) => {
+            console.log(text);
+            switch (text) {
+                case '': return `Use Parameter "g" for gif url and "t" for custom text or use predifined text ex:\n"localhost:5500/index.html?t=hello"\n"localhost:5500/index.html?t=hello_my_friend!"\n!Use _ for space`;
+                case 'hello': return 'Hello! How are you doing?';
+                default: return text;
+            }
+        }
+
+        const sleep = (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        const slowPrint = async (input) => {
+            let outPutText = '';
+            for (let char of [...input]) {
+                if (char === '_') char = '\xa0';
+                outPutText += char;
+                textEl.innerText = outPutText;
+                await sleep(speed);
+            }
+        }
+
+        const init = () => {
+            console.log(queries);
+            const index_s = queries.indexOf('s');
+            const index_t = queries.indexOf('t');
+            const index_g = queries.indexOf('g');
+
+            speed = (index_s > -1 && index_s + 1 < queries.length) ? queries[index_s + 1] : 200;
+            (index_t > -1 && index_t + 1 < queries.length) ? slowPrint(texts(queries[index_t + 1])) : slowPrint(texts(''));
+            gifEl.src = (index_g > -1 && index_g + 1 < queries.length) ? gifs(queries[index_g + 1]) : gifs('');
+        }
+
+        init();
+
+    </script>
+</body>
+
+</html>
