@@ -126,10 +126,12 @@
             let outPutText = '';
             for (let char of [...input]) {
                 if (char === '_') char = ' ';
+                if (char === '\\') char = '\n';
                 outPutText += char;
                 textEl.innerText = outPutText;
                 await sleep(speed);
             }
+            console.log()
         }
 
         const init = () => {
