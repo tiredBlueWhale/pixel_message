@@ -6,16 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel Message</title>
     <style>
-        @font-face {
-            font-family: 'subwt';
-            src: url('SUBWT___.ttf') format('ttf'),
-                url('SUBWT___.ttf') format('truetype');
-        }
-
         @import url('https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap');
 
         * {
-            /* font-family: 'subwt'; */
             font-family: 'Cutive Mono', monospace;
             font-size: 20px;
             font-weight: 500;
@@ -32,24 +25,22 @@
         }
 
         body {
-            display: grid;
-            place-items: end center;
-            background-color: black;
+            display: flex;
 
+            background-color: black;
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
         }
 
         #container {
-            border: 1px solid white;
-            min-height: 100px;
-            width: calc(100vw - 32px);
+            flex: 1 1 auto;
+            border: 2px solid white;
             padding: 16px;
+            margin: auto 32px 64px 32px;
+
             display: flex;
             flex-direction: row;
-            align-items: center;
-            margin-bottom: 50px;
             background-color: black;
         }
 
@@ -57,11 +48,11 @@
             flex: 0;
             max-height: 200px;
             width: 100%;
-            margin-right: 16px;
-
+            padding-right: 24px;
         }
 
         #text {
+            padding: 10px 0px;
             flex: 1 1 auto;
             word-wrap: break-word !important;
             word-wrap: break-all;
@@ -89,67 +80,69 @@
         <img id="gif" src="" alt="Speaking Character GIF" />
         <div id="text">
         </div>
-    </div>
-    <script>
+        <script>
+            const container = document.getElementById("container");
+            const gifEl = document.getElementById("gif");
+            const textEl = document.getElementById("text");
+            const params = new URLSearchParams(window.location.search);
 
-        const container = document.getElementById("container");
-        const gifEl = document.getElementById("gif");
-        const textEl = document.getElementById("text");
-        const queries = window.location.search.substring(1).split('&').flatMap(query => query.split('='));
-        let speed = 200;
-        // textEl.style.width = container.clientWidth - gifEl.clientWidth - 32 - 16 + 'px';
-
-        const gifs = (src) => {
-            console.log('SOURCE: ' + src);
-            switch (src) {
-                case '': return 'https://media.tenor.com/images/760939e5dd77b06637ddd716f67ee8f6/tenor.gif'
-                case 'girl': return 'https://media1.tenor.com/images/c748732127a8d180888fa4520a08ab14/tenor.gif?itemid=15967773';
-                default: return src;
+            const text = () => {
+                const text = getParam('text')
+                if (text == '') {
+                    window.location.href = `${window.location.href}?text=Replace params in url to change this chat%0Atext: for text&speed=30&speaker=https://media.tenor.com/images/760939e5dd77b06637ddd716f67ee8f6/tenor.gif&bg=https://media1.tenor.com/m/GgNgd97pQ60AAAAd/winnie-the-pooh-hungry.gif`
+                }
+                switch (text) {
+                    // case '': return ""
+                    // case 'hello': return 'Hello! How are you doing?';
+                    default: return text;
+                }
             }
-        }
 
-        const texts = (text) => {
-            console.log(text);
-            switch (text) {
-                case '': return `Use Parameter "g" for gif url and "t" for custom text or use predifined text ex:\n"localhost:5500/index.html?t=hello"\n"localhost:5500/index.html?t=hello_my_friend!"\n!Use underscore for space`;
-                case 'hello': return 'Hello! How are you doing?';
-                case 'xyz': return 'Hallo Oma, \n ich wünsche dir einen guten Rutsch ins neue Jahr. \n Und vielen Dank für das Weihanchtsgeschenk.\n\n Viele Grüße \n Luca';
-                default: return text;
+            const gifs = () => {
+                const src = getParam('speaker')
+                switch (src) {
+                    case '': return 'https://media.tenor.com/images/760939e5dd77b06637ddd716f67ee8f6/tenor.gif'
+                    case 'girl': return 'https://media1.tenor.com/images/c748732127a8d180888fa4520a08ab14/tenor.gif?itemid=15967773';
+                    case 'question': return 'https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExN3hxZHhuOHExOWhkcThpOTZidzhnYWN0cHd2aDB4MGpmdndpMGUwOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tU2mV8ALzJEdXAAwRo/giphy.webp'
+                    default: return src;
+                }
             }
-        }
 
-        const sleep = (ms) => {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        const slowPrint = async (input) => {
-            let outPutText = '';
-            for (let char of [...input]) {
-                if (char === '_') char = ' ';
-                if (char === '\\') char = '\n';
-                outPutText += char;
-                textEl.innerText = outPutText;
-                await sleep(speed);
+            const bg = () => {
+                const src = getParam('bg')
+                switch (src) {
+                    case '': return 'https://media1.tenor.com/m/GgNgd97pQ60AAAAd/winnie-the-pooh-hungry.gif'
+                    case 'girl': return 'https://media1.tenor.com/images/c748732127a8d180888fa4520a08ab14/tenor.gif?itemid=15967773';
+                    default: return src;
+                }
             }
-            console.log()
-        }
 
-        const init = () => {
-            console.log(queries);
-            const index_s = queries.indexOf('s');
-            const index_t = queries.indexOf('t');
-            const index_g = queries.indexOf('g');
-            const index_b = queries.indexOf('b');
+            const sleep = (ms) => {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
 
-            speed = (index_s > -1 && index_s + 1 < queries.length) ? queries[index_s + 1] : speed;
-            (index_t > -1 && index_t + 1 < queries.length) ? slowPrint(texts(queries[index_t + 1])) : slowPrint(texts(''));
-            gifEl.src = (index_g > -1 && index_g + 1 < queries.length) ? gifs(queries[index_g + 1]) : gifs('');
-            document.body.style.backgroundImage = (index_b > -1 && index_b + 1 < queries.length) ? `url(${queries[index_b + 1]})` : "";
-        }
+            const print = async (text, speed = 0) => {
+                let outPutText = '';
+                for (let char of [...text]) {
+                    outPutText += char;
+                    textEl.innerText = outPutText;
+                    await sleep(speed);
+                }
+            }
 
-        init();
+            const getParam = (param, defaultParam = '') => {
+                return params.has(param) ? params.get(param) : defaultParam
+            }
 
-    </script>
+            const init = () => {
+                print(text(), getParam('speed', 30))
+                gifEl.src = gifs()
+                document.body.style.backgroundImage = `url(${bg()})`
+            }
+
+            init();
+
+        </script>
 </body>
 
 </html>
